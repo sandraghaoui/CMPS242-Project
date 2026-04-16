@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.*;
 
 public class WebServer {
 
@@ -79,8 +80,56 @@ class HttpRequest implements Runnable {
         while ((headerLine = br.readLine()).length() != 0) {
             System.out.println(headerLine);
         }
+        // Extract the filename from the request line.
+        StringTokenizer tokens = new StringTokenizer(requestLine);
+        tokens.nextToken(); // skip over the method, which should be "GET"
+        String fileName = tokens.nextToken();
+        // Prepend a "." so that file request is within the current directory.
+        fileName = "." + fileName;
+        
+        // Open the requested file.
+        FileInputStream fis = null;
+        boolean fileExists = true;
+        try
+        {
+            fis = new FileInputStream(fileName);
+        }
+        catch (FileNotFoundException e)
+        {
+            fileExists = false;
+        }
+        
+        // Construct the response message.
+        String statusLine = null;
+        String contentTypeLine = null;
+        String entityBody = null;
+        if (fileExists)
+        {
+            statusLine = "HTTP/1.0 200 OK"+CRLF;
+            contentTypeLine = "Content-type: " +
+                              contentType( fileName ) + CRLF;
+        }
+        else
+        {
+            statusLine = "HTTP/1.0 404 Not Found" + CRLF;
+            contentTypeLine = "Content-type: text/html" + CRLF;
+            entityBody = "<HTML>" + "<HEAD><TITLE>Not Found</TITLE></HEAD>" +
+                         "<BODY>Not Found</BODY></HTML>";
+        }
+        // Send the status line.
+        os.writeBytes(statusLine);
+        // Send the content type line.
+        os.writeBytes(contentTypeLine);
+        //Send a blank line to indicate the end of the header lines.
+        os.writeBytes(CRLF);
+        
+        // Send the entity body.
+        if (fileExists) {
+            sendBytes(fis, os); fis.close();
+        } else {
+            os.writeBytes(entityBody);
+        }
 
-      
         os.close();
         br.close();
         socket.close();
