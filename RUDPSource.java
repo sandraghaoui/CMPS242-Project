@@ -87,9 +87,12 @@ public class RUDPSource {
                 socket.receive(in);
 
                 RUDPCommon.Packet ack = RUDPCommon.parse(in.getData(), in.getLength());
+
                 if (ack.checksumOk && ack.type == RUDPCommon.TYPE_ACK && ack.seq == expectedAckSeq) {
+                    System.out.println("[ACK RECEIVED]: seq " + expectedAckSeq);
                     return;
                 }
+
             } catch (SocketTimeoutException e) {
                 System.out.println("[TIMEOUT]: seq " + expectedAckSeq + " -> retransmitting");
             }
