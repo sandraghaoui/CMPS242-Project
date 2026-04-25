@@ -25,7 +25,8 @@ public class UnreliableChannel {
         int c = dest.lastIndexOf(':');
         IP[1] = InetAddress.getByName(dest.substring(0, c));
         userPort[1] = Integer.parseInt(dest.substring(c + 1));
-
+        
+        System.out.println("Channel listening on port " + port + " | loss=" + p + " | delay=" + minD + "-" + maxD + "ms | dest=localhost:" + userPort[1]);
         Random rnd = new Random();
         DatagramSocket socket = new DatagramSocket(port);
         byte[] buffer = new byte[4096]; 
@@ -69,6 +70,7 @@ public class UnreliableChannel {
             if (rnd.nextDouble() <= p) {
                 // drop packet with probability p
                 lost[index]++;
+                System.out.println("[CHANNEL]: dropped packet from " + user[index]);
             } else {
                 int destIndex = 1 - index; // the other party
                 if (IP[destIndex] == null) {
@@ -84,6 +86,7 @@ public class UnreliableChannel {
             byte[] outData = new byte[dp.getLength()];
             System.arraycopy(dp.getData(), 0, outData, 0, dp.getLength());
             socket.send(new DatagramPacket(outData, outData.length, IP[destIndex], userPort[destIndex]));
+            System.out.println("[CHANNEL]: forwarded packet from " + user[index] + " | delay " + delay + "ms");
             delayed[index]++;
             totalDelay[index] += delay;
             }
