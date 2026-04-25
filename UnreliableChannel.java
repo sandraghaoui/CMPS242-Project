@@ -4,12 +4,11 @@ import java.util.Random;
 public class UnreliableChannel {
 
     public static void main(String[] args) throws Exception {
-
+        
         int port = Integer.parseInt(args[0]);
         double p = Double.parseDouble(args[1]);
         int minD = Integer.parseInt(args[2]);
         int maxD = Integer.parseInt(args[3]);
-
         String[] user = new String[2];
         InetAddress[] IP = new InetAddress[2];
         int[] userPort = new int[2];
@@ -20,10 +19,17 @@ public class UnreliableChannel {
         boolean[] ends = new boolean[2];
         user[0] = "A";
         user[1] = "B";
+        
+        if (args.length >= 5) {
+            String dest = args[4];
+            int c = dest.lastIndexOf(':');
+            IP[1] = InetAddress.getByName(dest.substring(0, c));
+            userPort[1] = Integer.parseInt(dest.substring(c + 1));
+        }
 
         Random rnd = new Random();
         DatagramSocket socket = new DatagramSocket(port);
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[4096];
 
         while (true) {
 
