@@ -20,12 +20,10 @@ public class UnreliableChannel {
         user[0] = "A";
         user[1] = "B";
         
-        if (args.length >= 5) {
-            String dest = args[4];
-            int c = dest.lastIndexOf(':');
-            IP[1] = InetAddress.getByName(dest.substring(0, c));
-            userPort[1] = Integer.parseInt(dest.substring(c + 1));
-        }
+        String dest = args[4];
+        int c = dest.lastIndexOf(':');
+        IP[1] = InetAddress.getByName(dest.substring(0, c));
+        userPort[1] = Integer.parseInt(dest.substring(c + 1));
 
         Random rnd = new Random();
         DatagramSocket socket = new DatagramSocket(port);
